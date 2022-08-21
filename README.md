@@ -17,8 +17,7 @@ helping reduce energy usage worldwide.
 ### Where is it wrong?
 
 When running Gradle using IntelliJ, IntelliJ injects a `init.gradle` init
-script, [`testFilterInit.gradle`](https://github.com/JetBrains/intellij-community/blob/bfcb5f072de24ff83060b1b11ce5f9064e58fc6d/plugins/gradle/tooling-extension-impl/src/org/jetbrains/plugins/gradle/tooling/internal/init/testFilterInit.gradle#L16)
-. This file does many things, including adding this code:
+script, [`testFilterInit.gradle`](https://github.com/JetBrains/intellij-community/blob/bfcb5f072de24ff83060b1b11ce5f9064e58fc6d/plugins/gradle/tooling-extension-impl/src/org/jetbrains/plugins/gradle/tooling/internal/init/testFilterInit.gradle#L16). This file does many things, including adding this code:
 
 ```groovy
 taskGraph.allTasks.each { Task task ->
@@ -40,10 +39,8 @@ and can hugely increase the amount of time spent running tests.
 ### What's the proposal?
 
 1. Migrate from a Groovy init script, to
-   an [Init Script Plugin](https://docs.gradle.org/current/userguide/init_scripts.html#sec:init_script_plugins)
-   -
-   [`IntellijGradleInitPlugin`](https://github.com/aSemy/intellij-gradle-init-plugin/blob/main/src/main/kotlin/dev/adamko/intellij/gradle_init/IntellijGradleInitPlugin.kt)
-   .
+   an [Init Script Plugin](https://docs.gradle.org/current/userguide/init_scripts.html#sec:init_script_plugins) -
+   [`IntellijGradleInitPlugin`](https://github.com/aSemy/intellij-gradle-init-plugin/blob/main/src/main/kotlin/dev/adamko/intellij/gradle_init/IntellijGradleInitPlugin.kt).
 
    This makes the change much more modular, easier to test and debug, and can be written in Kotlin.
 
@@ -54,13 +51,11 @@ and can hugely increase the amount of time spent running tests.
    print the XML messages to file, and register that file as a task output.
 
 3. The init script plugin will register an additional
-   task, [`IJTestEventLoggerTask`](https://github.com/aSemy/intellij-gradle-init-plugin/blob/main/src/main/kotlin/dev/adamko/intellij/gradle_init/IJTestEventLoggerTask.kt)
-   , that will
+   task, [`IJTestEventLoggerTask`](https://github.com/aSemy/intellij-gradle-init-plugin/blob/main/src/main/kotlin/dev/adamko/intellij/gradle_init/IJTestEventLoggerTask.kt), that will
    collect all of those files.
 
 4. [`IJTestEventLoggerTask`](https://github.com/aSemy/intellij-gradle-init-plugin/blob/main/src/main/kotlin/dev/adamko/intellij/gradle_init/IJTestEventLoggerTask.kt)
    will determine if the test tasks have already run, and if they
    haven't (because
-   they're [up-to-date](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:task_outcomes))
-   ,
+   they're [up-to-date](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:task_outcomes)),
    will print them to stdout.
