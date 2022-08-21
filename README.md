@@ -69,6 +69,8 @@ and can hugely increase the amount of time spent running tests.
    (Extra bonus: the init script plugin can be updated independently of an IntelliJ release -
    meaning bug fixes can be released faster.)
 
+2. IntelliJ will apply the new plugin in [`addTestListener.init.gradle`](https://github.com/aSemy/intellij-community/blob/99c23d812cb594d348f871da7bb97b276e7c1f09/plugins/gradle/java/resources/org/jetbrains/plugins/gradle/java/addTestListener.init.gradle#L4-L15)
+
 2. When the test tasks run, they'll log the IJLog XML to stdout as normal. Additionally, they'll
    print the XML messages to file, and register that file as a task output.
 
