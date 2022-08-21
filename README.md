@@ -24,7 +24,7 @@ script, [`testFilterInit.gradle`](https://github.com/JetBrains/intellij-communit
 taskGraph.allTasks.each { Task task ->
   if (task instanceof Test || (abstractTestTaskClass != null && abstractTestTaskClass.isAssignableFrom(task.class))) {
 
-    task.outputs.upToDateWhen { false } // this breaks 
+    task.outputs.upToDateWhen { false } // <- here's the problem! 
 
   }
 }
