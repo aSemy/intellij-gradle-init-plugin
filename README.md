@@ -14,7 +14,7 @@ https://youtrack.jetbrains.com/issue/IDEA-240111
    ./gradlew publishToMavenLocal
    ```
 
-2. Run the updated IntelliJ version that uses the plugin 
+2. Run the [updated IntelliJ version](https://github.com/aSemy/intellij-community/pull/1/files) that uses the plugin 
    ```shell
    cd $IntelliJCommunityRepo
    
