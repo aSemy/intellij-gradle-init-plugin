@@ -4,6 +4,28 @@ Proposal for improving IntelliJ compatibility with Gradle incremental tasks
 
 https://youtrack.jetbrains.com/issue/IDEA-240111
 
+#### Quickstart
+
+1. Install this project
+   ```shell
+   cd $MyGitProjectsDir
+   git clone git@github.com:aSemy/intellij-gradle-init-plugin.git
+   cd intellij-gradle-init-plugin
+   ./gradlew publishToMavenLocal
+   ```
+
+2. Run the updated IntelliJ version that uses the plugin 
+   ```shell
+   cd $IntelliJCommunityRepo
+   
+   git remote add forks/aSemy git@github.com:aSemy/intellij-community.git
+   git fetch forks/aSemy 
+   git checkout forks/aSemy/fix/gradle-incremental-test-tasks-2
+   
+   # run IDEA
+   ```
+
+
 ### What's wrong?
 
 IntelliJ breaks a Gradle feature for avoiding re-running tasks.
