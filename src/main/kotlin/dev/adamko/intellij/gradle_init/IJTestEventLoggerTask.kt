@@ -31,38 +31,42 @@ abstract class IJTestEventLoggerTask : DefaultTask() {
   }
 
 
-  // try and use Worker API, hopefully IO doesn't block Gradle
+  // try and use Worker API? Might improve performance? So IO doesn't block Gradle
   @TaskAction
   fun exec() {
+    val eventLogs = findTestEventLogFiles()
 
-    // find all log files
-    val files = logFileDirectories.files.flatMap { dir ->
-      dir.walk()
-        .filter { it.isFile && it.name.endsWith(IJ_TEST_EVENT_LOG_FILE_EXT) }
+    val currentState = computeMd5(eventLogs)
+
+    val storedState = stateFile.run {
+      createNewFile() // create it, just in case it doesn't already exist
+      readText().trim()
     }
-
-    logger.lifecycle("[IJTestEventLoggerTask] checking ${files.size} files")
-
-    val currentState = computeMd5(files)
-
-    stateFile.createNewFile() // create it, just in case it doesn't already exist
-    val storedState = stateFile.readText().trim()
 
     logger.lifecycle("[IJTestEventLoggerTask] currentState: $currentState, storedState: $storedState")
 
     if (currentState == storedState) {
-      logger.lifecycle("[IJTestEventLoggerTask] printing stored logs from $files")
+      logger.lifecycle("[IJTestEventLoggerTask] printing stored logs from ${eventLogs.size} files $eventLogs")
       // We are go to launch! The input files haven't changed, therefore the Test tasks didn't run.
       // Since they didn't run, they didn't directly print the IJ Test XML to stdout.
-      printStoredLogs(files)
+      printStoredLogs(eventLogs)
     } else {
       logger.lifecycle("[IJTestEventLoggerTask] skipping printing - test tasks run")
-      // Abort! The input files have changed, therefore the Test tasks ran, and they directly
+      // Do nothing! The input files have changed, therefore the Test tasks ran, and they directly
       // logged the IJ Test XML to stdout
     }
 
     // finally, update the state file
     stateFile.writeText(currentState)
+  }
+
+
+  private fun findTestEventLogFiles(): List<File> {
+    // find all log files
+    return logFileDirectories.files.flatMap { dir ->
+      dir.walk()
+        .filter { it.isFile && it.name.endsWith(IJ_TEST_EVENT_LOG_FILE_EXT) }
+    }
   }
 
 
@@ -84,7 +88,9 @@ abstract class IJTestEventLoggerTask : DefaultTask() {
 
     private fun computeMd5(files: Collection<File>): String {
       val md5 = MessageDigest.getInstance("MD5")
-      files.forEach { md5.update(it.readBytes()) }
+      files
+        .filter { it.isFile }
+        .forEach { md5.update(it.readBytes()) }
 
       return md5.digest().toHexString()
     }

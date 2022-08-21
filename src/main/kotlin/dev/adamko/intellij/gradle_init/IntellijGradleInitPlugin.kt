@@ -80,9 +80,9 @@ abstract class IntellijGradleInitPlugin @Inject constructor(
           }.map { it.toURI().toURL() }
 
           val daemonMainClass = Class.forName("org.gradle.launcher.daemon.bootstrap.DaemonMain")
-//          logger.lifecycle("[GradleDaemonClasspathService] got DaemonMain class $daemonMainClass")
+          logger.debug("[GradleDaemonClasspathService] got DaemonMain class $daemonMainClass")
           val classLoader = daemonMainClass.classLoader
-//          logger.lifecycle("[GradleDaemonClasspathService] got DaemonMain classloader $classLoader")
+          logger.debug("[GradleDaemonClasspathService] got DaemonMain classloader $classLoader")
 
           if (classLoader is URLClassLoader) {
             classLoader.addURLs(urls)
