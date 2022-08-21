@@ -41,6 +41,8 @@ and can hugely increase the amount of time spent running tests.
 
 1. Migrate from a Groovy init script, to
    an [Init Script Plugin](https://docs.gradle.org/current/userguide/init_scripts.html#sec:init_script_plugins)
+   -
+   [`IntellijGradleInitPlugin`](https://github.com/aSemy/intellij-gradle-init-plugin/blob/main/src/main/kotlin/dev/adamko/intellij/gradle_init/IntellijGradleInitPlugin.kt)
    .
 
    This makes the change much more modular, easier to test and debug, and can be written in Kotlin.
