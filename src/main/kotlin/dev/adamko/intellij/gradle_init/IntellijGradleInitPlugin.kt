@@ -8,8 +8,6 @@ import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -17,8 +15,6 @@ import org.gradle.kotlin.dsl.withType
 
 abstract class IntellijGradleInitPlugin @Inject constructor(
   private val files: FileSystemOperations,
-  private val objects: ObjectFactory,
-  private val providers: ProviderFactory,
 ) : Plugin<Gradle> {
 
   private val logger: Logger = Logging.getLogger(this::class.java)
@@ -69,15 +65,14 @@ abstract class IntellijGradleInitPlugin @Inject constructor(
       allTasks.filterIsInstance<Test>().forEach { task ->
         enhanceGradleDaemon(task)
 
-        task.testLogging.showStandardStreams =
-          false // copied from Groovy, not sure why this is here
+        // copied from Groovy, not sure why this is here
+        task.testLogging.showStandardStreams = false
       }
     }
   }
 
   private fun enhanceGradleDaemon(task: Test) {
     try {
-
       task.doFirst {
         try {
           val urls = task.classpath.files.filter {
@@ -91,9 +86,12 @@ abstract class IntellijGradleInitPlugin @Inject constructor(
 
           if (classLoader is URLClassLoader) {
             classLoader.addURLs(urls)
-            val missingURLs = urls - classLoader.urLs.toSet()
-            if (missingURLs.isNotEmpty()) {
-              logger.error("unable to enhance gradle daemon classloader with idea_rt.jar (could not add ${missingURLs})")
+            val currentURLs = classLoader.urLs.toSet()
+            if (currentURLs.containsAll(urls)) {
+              val missingURLs = urls - currentURLs
+              logger.error("unable to enhance gradle daemon classloader with idea_rt.jar (missingURLs: ${missingURLs}, currentURLs: $currentURLs))")
+            } else {
+              logger.info("enhanced gradle daemon classloader with idea_rt.jar (urls: $urls, currentURLs: $currentURLs)")
             }
           } else {
             logger.error("unable to enhance gradle daemon classloader with idea_rt.jar (unknown ClassLoader $classLoader)")
@@ -109,7 +107,7 @@ abstract class IntellijGradleInitPlugin @Inject constructor(
 
   companion object {
 
-    // addURL() method is protected, so here's an adapter
+    // URLClassLoader.addURL() method is protected, so here's an adapter
     private fun URLClassLoader.addURLs(urls: Collection<URL>) =
       object : URLClassLoader(urLs, parent) {
         init {

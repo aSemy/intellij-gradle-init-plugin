@@ -56,7 +56,11 @@ class IJTestEventLogger(
 
 //    logger.lifecycle("[IJTestEventLogger] received $testEventType, created XML $xml")
 
-    appendTestLogFile(testReportDir, "<ijLog>$xml</ijLog>")
+    val ijLog = "<ijLog>$xml</ijLog>"
+
+    println(ijLog)
+
+    appendTestLogFile(testReportDir, ijLog)
   }
 
   companion object {
